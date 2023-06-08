@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My Page</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='form-style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>My Page</h1>
+      <p>Balance: {{ session['user_balance'] }} KRW</p>
+      <p>Coin: {{ session['user_coin_count'] }}</p>
+      {% if error %}
+      <p>{{ error }}</p>
+      {% endif %}
+      <form method="post" action="{{ url_for('my_page') }}">
+        <label for="amount">Amount:</label><br />
+        <input type="number" name="amount" id="amount" required /><br /><br />
+        <div class="box">
+          <input type="submit" name="add" value="Add" class="btn-primary" />
+          <input
+            type="submit"
+            name="withdraw"
+            value="Withdraw"
+            class="btn-primary"
+          />
+        </div>
+      </form>
+    </div>
+  </body>
+</html>

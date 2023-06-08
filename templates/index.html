@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    {% if 'username' in session %}
+        <h1>Hello, {{ session['username'] }}!</h1>
+        <a href="/logout"><button>Logout</button></a>
+        <a href="/myPage"><button>MyPage</button></a>
+    {% elif 'username' not in session %}
+        <h1>Welcome to the website!</h1>
+        <a href="/login"><button>Login</button></a> | <a href="/register"><button>Register</button></a>
+    {% endif %}
+
+</body>
+</html>

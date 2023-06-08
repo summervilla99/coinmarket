@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="hero">
+        <h1>Welcome to My Crypto Exchange</h1>
+        <p>Your trusted platform for trading cryptocurrencies.</p>
+        {% if show_buttons %}
+            <div>
+                <a href="/login" class="btn btn-outline-light btn-lg">Login</a>
+                <a href="/register" class="btn btn-outline-light btn-lg">Register</a>
+                <a href="/spot" class="btn btn-outline-light btn-lg">Spot</a>
+            </div>
+        {% else %}
+            <div>
+                <a href="/get_started" class="btn btn-outline-light btn-lg">Get Started</a>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

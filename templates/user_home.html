@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="hero">
+        <h1>Welcome, {{ username }}!</h1>
+        <p>Let's get to the cryptocurrency.</p>
+            <div>
+                <a href="/logout" class="btn btn-outline-light btn-lg">Logout</a>
+                <a href="/myPage" class="btn btn-outline-light btn-lg">MyPage</a>
+                <a href="/spot" class="btn btn-outline-light btn-lg">Spot</a>
+            </div>
+    </div>
+</body>
+</html>

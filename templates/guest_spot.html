@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Spot Page</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1 style="color:white">Coin Marketplace</h1>
+    <a href="/"><p>Return to Index Page</p></a>
+
+    <div class="container">
+        <div class="left-section">
+            <div class="info-block">
+                <h2>Current Coin Price</h2>
+                <p><span id="coinPrice" class="price-text">{{ coin_price|default(coin_price) }}</span></p>
+            </div>
+
+            <div class="info-block">
+                <h2>Available Coins</h2>
+                <p><span id="availableCoins" class="amount-text">{{ available_coins }}</span></p>
+            </div>
+            <br><br>
+            <div class="info-block">
+                <h2>Please sign up if you want to trade cryptocurrency!</h2>
+                <p>Click 'register' to sign up <a href="{{ url_for('register') }}">Register</a></p>
+            </div>
+        </div>
+
+        <div class="right-section">
+            <h2>Price History</h2>
+            <div class="chart-container">
+                <canvas id="priceHistoryChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <h2 style="color:white">Selling Posts</h2>
+    <div class="right-section">
+        <div id="sellingPosts" class="container">
+            {% for post in user_selling_posts %}
+                {% if post.status == 'open' %}
+                <div id="{{ post._id }}">
+                    <h3>{{ post.username }}</h3>
+                    <p>{{ post.number_of_coins }} coins for {{ post.selling_price }} each</p>
+                    <form action="/buy_from_user" method="POST">
+                        <input type="hidden" name="sell_order_id" value="{{ post._id }}">
+                        <button type="submit">Buy</button>
+                    </form>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        var priceHistory = {{ price_history|tojson|safe }};
+    
+        function displayPriceHistory(priceHistory) {
+            var labels = priceHistory.map(entry => entry.date);
+            var prices = priceHistory.map(entry => entry.price);
+    
+            var ctx = document.getElementById('priceHistoryChart').getContext('2d');
+            var chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Price History',
+                        data: prices,
+                        fill: false,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        tension: 0.1
+                    }]
+                }
+            });
+    
+            return chart;
+        }
+    
+        function updatePriceHistory() {
+            var request = new XMLHttpRequest();
+            request.open('GET', '/get_coin_price', false);
+            request.send();
+        
+            if (request.status === 200) {
+                var response = JSON.parse(request.responseText);
+                var coinPrice = response.coin_price;
+                chart.data.labels.push(new Date().toISOString());
+                chart.data.datasets[0].data.push(coinPrice);
+                chart.update();
+            } else {
+                console.log('Error:', request.status);
+            }
+        }
+        
+        function updateCoinPrice() {
+            var request = new XMLHttpRequest();
+            request.open('GET', '/get_coin_price', false);
+            request.send();
+        
+            if (request.status === 200) {
+                var response = JSON.parse(request.responseText);
+                var coinPrice = response.coin_price;
+                document.getElementById('coinPrice').textContent = coinPrice;
+            } else {
+                console.log('Error:', request.status);
+            }
+        }
+    
+        var urlParams = new URLSearchParams(window.location.search);
+        var coinPriceParam = urlParams.get('coin_price');
+        var coinPrice = coinPriceParam ? parseFloat(coinPriceParam) : {{ coin_price|default(coin_price) }};
+    
+        var chart = displayPriceHistory(priceHistory);
+        updatePriceHistory();
+        updateCoinPrice();
+    
+        var soldSellingPostId = "{{ sold_selling_post_id }}";
+        if (soldSellingPostId) {
+            var soldSellingPostElement = document.getElementById(soldSellingPostId);
+            if (soldSellingPostElement) {
+                soldSellingPostElement.remove();
+                updatePriceHistory();
+                updateCoinPrice();
+            }
+        }
+        </script>
+</body>
+</html>

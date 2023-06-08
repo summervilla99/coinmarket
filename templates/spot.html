@@ -1,0 +1,155 @@
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <script>
+            alert("{{messages[-1]}}")
+        </script>
+    {% endif %}
+{% endwith %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Spot Page</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1 style="color:white">Spot</h1>
+    <a href="/"><p>Return to Index Page</p></a>
+    <div class="container">
+        <div class="left-section">
+            <div class="info-block">
+                <h2>Current Coin Price</h2>
+                <p><span id="coinPrice" class="price-text">{{ coin_price|default(coin_price) }}</span> KRW</p>
+            </div>
+
+            <div class="info-block">
+                <h2>Available Coins</h2>
+                <p><span id="availableCoins" class="amount-text">{{ available_coins }}</span></p>
+            </div>
+
+            <div class="info-block">
+                <h2>User Balance</h2>
+                <p><span id="userBalance" class="balance-text">{{ user_balance }} KRW</span></p>
+            </div>
+
+            <div class="info-block">
+                <h2>Coin</h2>
+                <p><span id="userCoinCount" class="coin-count">{{ user_coin_count }}</span></p>
+            </div>
+
+            <form class="buy-form" action="/buy" method="POST">
+                <h2>Buy Coins from Marketplace</h2>
+                <input type="number" name="amount" placeholder="Amount to buy" class="input-field">
+                <button class="btn-primary" type="submit" class="action-button">Buy</button>
+            </form>
+
+            <form class="sell-form" action="/create_sell_order" method="POST">
+                <h2>Create Sell Order</h2>
+                <input type="number" name="amount" placeholder="Amount to sell" class="input-field">
+                <input type="number" name="selling_price" placeholder="Selling price" class="input-field">
+                <button class="btn-primary" type="submit" class="action-button">Sell</button>
+            </form>
+        </div>
+
+        <div class="right-section">
+            <h2>Price History</h2>
+            <div class="chart-container">
+                <canvas id="priceHistoryChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <h2 style="color:white">Selling Posts</h2>
+        <div id="sellingPosts" class="selling-posts-container">
+            {% for post in user_selling_posts %}
+                {% if post.status == 'open' %}
+                <div class="sellingPost" id="{{ post._id }}">
+                    <h3 style="margin-left:15px">{{ post.username }}</h3>
+                    <p style="text-align: center">{{ post.number_of_coins }} coins for<br>{{ post.selling_price }} KRW</p>
+                    <form action="/buy_from_user" method="POST">
+                        <input type="hidden" name="sell_order_id" value="{{ post._id }}">
+                        <button style="margin-left:20px" class="btn-primary" type="submit">Buy</button>
+                    </form>
+                </div>
+                {% endif %}
+            {% endfor %}
+    </div>
+
+    <script>
+    var priceHistory = {{ price_history|tojson|safe }};
+
+    function displayPriceHistory(priceHistory) {
+        var labels = priceHistory.map(entry => entry.date);
+        var prices = priceHistory.map(entry => entry.price);
+
+        var ctx = document.getElementById('priceHistoryChart').getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Price History',
+                    data: prices,
+                    fill: false,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    tension: 0.1
+                }]
+            }
+        });
+
+        return chart;
+    }
+
+    function updatePriceHistory() {
+        var request = new XMLHttpRequest();
+        request.open('GET', '/get_coin_price', false);
+        request.send();
+    
+        if (request.status === 200) {
+            var response = JSON.parse(request.responseText);
+            var coinPrice = response.coin_price;
+            chart.data.labels.push(new Date().toISOString());
+            chart.data.datasets[0].data.push(coinPrice);
+            chart.update();
+        } else {
+            console.log('Error:', request.status);
+        }
+    }
+    
+    function updateCoinPrice() {
+        var request = new XMLHttpRequest();
+        request.open('GET', '/get_coin_price', false);
+        request.send();
+    
+        if (request.status === 200) {
+            var response = JSON.parse(request.responseText);
+            var coinPrice = response.coin_price;
+            document.getElementById('coinPrice').textContent = coinPrice;
+        } else {
+            console.log('Error:', request.status);
+        }
+    }
+
+    var urlParams = new URLSearchParams(window.location.search);
+    var coinPriceParam = urlParams.get('coin_price');
+    var coinPrice = coinPriceParam ? parseFloat(coinPriceParam) : {{ coin_price|default(coin_price) }};
+
+    var chart = displayPriceHistory(priceHistory);
+    updatePriceHistory();
+    updateCoinPrice();
+
+    var soldSellingPostId = "{{ sold_selling_post_id }}";
+    if (soldSellingPostId) {
+        var soldSellingPostElement = document.getElementById(soldSellingPostId);
+        if (soldSellingPostElement) {
+            soldSellingPostElement.remove();
+            updatePriceHistory();
+            updateCoinPrice();
+        }
+    }
+    </script>
+</body>
+</html>
