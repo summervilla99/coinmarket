@@ -6,7 +6,7 @@ A Coin Marketplace User Manual
 2018112103 이지환
 2021113425 김현지
 
-/* <br>
+/*
 Before enter the web page
 - you should set environment variable of running FLASK on VSCode or your own IDE.
 - you should install libraries below
