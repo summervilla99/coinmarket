@@ -37,5 +37,6 @@ A Coin Marketplace User Manual
 7.	Price Change History
 -	If there are multiple transactions for coin trading and price changes, the site will show the price change history in the form of a graph.
 
+<br><br>
 
 ![image](https://github.com/summervilla99/coinmarket/assets/121385141/ae6d5703-d8fe-4ee9-b149-84b69509d114)
