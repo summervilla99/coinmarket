@@ -6,6 +6,21 @@ A Coin Marketplace User Manual
 2018112103 이지환
 2021113425 김현지
 
+/* Before entering the web page
+- you should set environment variable of running FLASK on VSCode or your own IDE.
+- you should install libraries below
+-> Here are the libraries.
+1. pip install flask
+2. pip install pymongo
+3. pip install certifi
+
+And then you can open the server.
+
+Server open code
+->Python test3.py
+->FLASK_APP=test3.py flask run (if you can't open with "python test3.py", you can use this code. but it works only MAC OS)
+
+
 1.	User Registration and Login
 -	Access Coin Marketplace via your web browser.
 -	Click the ‘Get started’ button in the center of the screen, then click the ‘Register’ or ‘Login’ button.
