@@ -20,6 +20,7 @@ Server open code
 ->Python test3.py
 ->FLASK_APP=test3.py flask run (if you can't open with "python test3.py", you can use this code. but it works only MAC OS)
 
+*/
 
 1.	User Registration and Login
 -	Access Coin Marketplace via your web browser.
